@@ -1,3 +1,3 @@
-module asciiArtJustify
+module ascii-art-output
 
-go 1.22.3
+go 1.21.9
