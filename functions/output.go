@@ -22,7 +22,7 @@ func OutputBuilder(splicedInput []string) string {
 			for i, letter := range part {
 				currentIndex := i + tracker
 				if InRange(currentIndex) {
-					result.WriteString(Arguments.color.color + Font[letter][count] + Colors["reset"])
+					result.WriteString(Arguments.Color.Color + Font[letter][count] + Colors["reset"])
 				} else {
 					result.WriteString(Font[letter][count])
 				}
@@ -34,15 +34,14 @@ func OutputBuilder(splicedInput []string) string {
 		tracker += len(part) + 2
 	}
 	return result.String()
-
 }
 
 // OutputDeliver delivers the output to the console
 func OutputDeliver(art string) error {
-	if !Arguments.output.on {
+	if Arguments.OutputFileName == "" {
 		fmt.Print(art)
 	} else {
-		file, err := os.Create(Arguments.output.fileName)
+		file, err := os.Create(Arguments.OutputFileName)
 		if err != nil {
 			return errors.New("internal")
 		}

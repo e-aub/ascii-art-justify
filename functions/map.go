@@ -10,7 +10,7 @@ var Font map[rune][]string
 
 func MapFont(toMap []rune) error {
 	Font = make(map[rune][]string)
-	file, err := os.Open("./templates/" + Arguments.banner)
+	file, err := os.Open("./templates/" + Arguments.Banner)
 	if err != nil {
 		return errors.New("fs")
 	}

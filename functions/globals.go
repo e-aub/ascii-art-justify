@@ -5,50 +5,32 @@ import (
 	"strings"
 )
 
-//flags struct
-
+// flags struct
 type ColorFlag struct {
-	on             bool
-	color          string
-	toColor        string
-	toColorIndices [][]int
-}
-
-type OutputFlag struct {
-	on       bool
-	fileName string
-}
-
-type JustifyFlag struct {
-	on    bool
-	align string
+	Color          string
+	ToColor        string
+	ToColorIndices [][]int
 }
 
 type arguments struct {
-	ToDraw  string
-	banner  string
-	color   ColorFlag
-	output  OutputFlag
-	justify JustifyFlag
+	ToDraw         string
+	Banner         string
+	Color          ColorFlag
+	OutputFileName string
+	Align          string
 }
 
 var Arguments = arguments{
 	ToDraw: "",
-	banner: "",
-	color: ColorFlag{
-		on:      false,
-		color:   "",
-		toColor: "",
+	Banner: "",
+	Color: ColorFlag{
+		Color:   "",
+		ToColor: "",
 	},
-	output: OutputFlag{
-		on:       false,
-		fileName: "",
-	},
-	justify: JustifyFlag{
-		on:    false,
-		align: "",
-	},
+	OutputFileName: "",
+	Align:          "",
 }
+
 var (
 	JustifyPattern = regexp.MustCompile(`^-{1,2}align`)
 	JustifyCheck   = regexp.MustCompile(`^(?:--align=)(center|left|right|justify)$`)

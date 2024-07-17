@@ -11,48 +11,41 @@ func ArgsChecker(args []string) error {
 	var stringArguments []string
 	if len(args) > 1 && ValidBanner.MatchString(args[len(args)-1]) {
 		if !strings.HasSuffix(args[len(args)-1], ".txt") {
-			Arguments.banner = args[len(args)-1] + ".txt"
+			Arguments.Banner = args[len(args)-1] + ".txt"
 		} else {
-			Arguments.banner = args[len(args)-1]
-
+			Arguments.Banner = args[len(args)-1]
 		}
 		args = args[:len(args)-1]
 	} else {
-		Arguments.banner = "standard.txt"
+		Arguments.Banner = "standard.txt"
 	}
 	for i := 0; i < len(args); i++ {
 		if OutputPattern.MatchString(args[i]) {
 			if output := OutputCheck.FindStringSubmatch(args[i]); output != nil {
-				if Arguments.output.on {
-					return fmt.Errorf("duplicate flag:%s\n%s", output[0], "--output"+Arguments.output.fileName)
-
+				if Arguments.OutputFileName != "" {
+					return fmt.Errorf("duplicate flag:%s\n%s", output[0], "--output"+Arguments.OutputFileName)
 				}
-				Arguments.output.on = true
-				Arguments.output.fileName = output[1]
+				Arguments.OutputFileName = output[1]
 			} else {
 				return errors.New("")
 			}
 		} else if ColorPattern.MatchString(args[i]) {
 			if color := ColorCheck.FindStringSubmatch(args[i]); color != nil {
-				if Arguments.color.on {
-					return fmt.Errorf("duplicate flag: %s\n%s%s%s", color[0], "--color=", Arguments.color.color, " "+Arguments.color.toColor)
+				if Arguments.Color.Color != "" {
+					return fmt.Errorf("duplicate flag: %s\n%s%s%s", color[0], "--color=", Arguments.Color.Color, " "+Arguments.Color.ToColor)
 				}
-				if strings.ToLower(color[1]) == "random" {
-					RandomColor()
-				} else if RgbPattern.MatchString(color[1]) {
+				if RgbPattern.MatchString(color[1]) {
 					color, err := RGB(color[1])
 					if err != nil {
 						log.Fatalln(err)
 					}
-					Arguments.color.on = true
-					Arguments.color.color = color
+					Arguments.Color.Color = color
 				} else if HexPattern.MatchString(color[1]) {
 					color, err := HexToRgb(color[1])
 					if err != nil {
 						log.Fatalln(err)
 					}
-					Arguments.color.on = true
-					Arguments.color.color = color
+					Arguments.Color.Color = color
 
 				} else {
 					colorCode, ok := Colors[strings.ToLower(color[1])]
@@ -61,42 +54,37 @@ func ArgsChecker(args []string) error {
 					}
 
 					color := "\033[38;2;" + colorCode + "m"
-					Arguments.color.on = true
-					Arguments.color.color = color
+					Arguments.Color.Color = color
 				}
 
 			}
 			if i+1 < len(args) {
-				validColor := ColorCheck.MatchString(args[i+1])
 				validOutput := OutputCheck.MatchString(args[i+1])
 				validBanner := ValidBanner.MatchString(args[i+1])
 				validJustify := JustifyCheck.MatchString(args[i+1])
-				if !validColor && !validBanner && !validOutput && !validJustify {
+				if !validBanner && !validOutput && !validJustify {
 					i++
-					Arguments.color.toColor = args[i]
+					Arguments.Color.ToColor = args[i]
 				} else {
 					continue
 				}
 			}
 		} else if JustifyPattern.MatchString(args[i]) {
 			if justify := JustifyCheck.FindStringSubmatch(args[i]); justify != nil {
-				if Arguments.justify.on {
-					return fmt.Errorf("duplicate flag:%s\n%s", justify[0], "--justify="+Arguments.justify.align)
-
+				if Arguments.Align != "" {
+					return fmt.Errorf("duplicate flag:%s\n%s", justify[0], "--justify="+Arguments.Align)
 				}
-				Arguments.justify.on = true
-				Arguments.justify.align = justify[1]
+				Arguments.Align = justify[1]
 			} else {
 				return errors.New("")
 			}
 		} else {
 			stringArguments = append(stringArguments, args[i])
 		}
-
 	}
 	if len(stringArguments) == 0 {
-		if Arguments.color.toColor != "" {
-			Arguments.ToDraw = Arguments.color.toColor
+		if Arguments.Color.ToColor != "" {
+			Arguments.ToDraw = Arguments.Color.ToColor
 		} else {
 			return fmt.Errorf("missing input string")
 		}
