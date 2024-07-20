@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	f "ascii-art-output/functions"
 )
@@ -13,7 +12,7 @@ func main() {
 	// Check if the provided flags and args are valid
 	err := f.ArgsChecker(os.Args[1:])
 	errHandler(err)
-	if f.Arguments.ToDraw == "" {
+	if f.Args.ToDraw == "" {
 		return
 	}
 	f.ToColorIndexes()
@@ -26,28 +25,14 @@ func main() {
 	// Split the input string and Build the output
 	spliced := f.Split()
 
-	if f.Arguments.OutputFileName != "" && f.Arguments.Color.Color != "" {
+	if (f.Args.FileName != "" && f.Args.ColorFlag.Color != f.Color{}) && (strings.HasSuffix(f.Args.FileName, ".txt")) {
 		var Answer string
-		yet := timer()
-		for !yet {
-			fmt.Println(".txt file doesn't support colors, Do you want to continue with Rich Text Format .rtf (y / n)")
-			fmt.Scanln(&Answer)
-			if Answer == "y" {
-				f.Arguments.OutputFileName = strings.Replace(f.Arguments.OutputFileName, ".txt", ".rtf", 1)
-				fmt.Println(f.Arguments.OutputFileName)
-				break
-			} else {
-				break
-			}
-
+		fmt.Println(".txt file doesn't support colors, Do you want to continue with Rich Text Format .rtf (y / n)")
+		fmt.Scanln(&Answer)
+		if Answer == "y" {
+			f.Args.FileName = strings.Replace(f.Args.FileName, ".txt", ".rtf", 1)
+			fmt.Println(f.Args.FileName)
 		}
-
-		// for time.Sleep(time.Second) {
-		// 	fmt.Scanln(&answer)
-		//
-		//
-		// }
-
 	}
 	art := f.OutputBuilder(spliced)
 
@@ -61,10 +46,4 @@ func errHandler(err error) {
 		fmt.Println(f.Errors[err.Error()])
 		os.Exit(1)
 	}
-}
-
-func timer() bool {
-	time.Sleep(time.Second * 3)
-	if A
-	return true
 }

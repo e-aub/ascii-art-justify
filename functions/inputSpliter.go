@@ -3,7 +3,7 @@ package functions
 import "strings"
 
 func Split() []string {
-	result := strings.Split(Arguments.ToDraw, "\\n")
+	result := strings.Split(Args.ToDraw, "\\n")
 	for index, line := range result {
 		if line == "" {
 			result[index] = "\\n"

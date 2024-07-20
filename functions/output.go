@@ -9,11 +9,21 @@ import (
 
 // OutputBuilder builds the output string
 func OutputBuilder(splicedInput []string) string {
-	var result strings.Builder
+	var result string
+	var color string
+	var reset string
+	rgb := Args.ColorFlag.Color
+	if (Args.ColorFlag.Color != Color{} && Args.FileName != "") {
+		color = Args.ColorFlag.RtfColor
+		reset = Args.ColorFlag.RtfReset
+	} else if (Args.ColorFlag.Color != Color{}) && Args.FileName == "" {
+		color = fmt.Sprintf(Args.ColorFlag.AnsiColor, rgb.R, rgb.G, rgb.B)
+		reset = Args.ColorFlag.AnsiReset
+	}
 	tracker := 0
 	for _, part := range splicedInput {
 		if part == "\\n" {
-			result.WriteString("\n")
+			result += "\n"
 			tracker += 2
 			continue
 		}
@@ -22,26 +32,33 @@ func OutputBuilder(splicedInput []string) string {
 			for i, letter := range part {
 				currentIndex := i + tracker
 				if InRange(currentIndex) {
-					result.WriteString(Arguments.Color.Color + Font[letter][count] + Colors["reset"])
+					result += color + Font[letter][count] + reset
 				} else {
-					result.WriteString(Font[letter][count])
+					result += Font[letter][count]
 				}
-
 			}
-			result.WriteString("\n")
+			result += "\n"
 			count++
 		}
 		tracker += len(part) + 2
 	}
-	return result.String()
+	if (Args.ColorFlag.Color != Color{}) && Args.FileName != "" {
+		result = strings.ReplaceAll(result, "\\", "\\\\")
+		result = strings.ReplaceAll(result, Args.ColorFlag.RtfReset, Args.ColorFlag.RtfResetCtrlWord)
+		result = strings.ReplaceAll(result, Args.ColorFlag.RtfColor, Args.ColorFlag.RtfColorCtrlWord)
+		result = strings.ReplaceAll(result, "\n", Args.ColorFlag.NewLineCtrlWord)
+		result = fmt.Sprintf(Args.ColorFlag.RtfHeader, rgb.R, rgb.G, rgb.B) + result + "}"
+		return result
+	}
+	return result
 }
 
 // OutputDeliver delivers the output to the console
 func OutputDeliver(art string) error {
-	if Arguments.OutputFileName == "" {
+	if Args.FileName == "" {
 		fmt.Print(art)
 	} else {
-		file, err := os.Create(Arguments.OutputFileName)
+		file, err := os.Create(Args.FileName)
 		if err != nil {
 			return errors.New("internal")
 		}

@@ -7,7 +7,7 @@ import (
 )
 
 func Minimize() ([]rune, error) {
-	str := strings.ReplaceAll(Arguments.ToDraw, "\n", "")
+	str := strings.ReplaceAll(Args.ToDraw, "\n", "")
 	var result []rune
 	for _, letter := range str {
 		if letter < ' ' || letter > '~' {

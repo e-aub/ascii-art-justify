@@ -2,33 +2,24 @@ package functions
 
 import (
 	"errors"
-	"fmt"
-	"math/rand"
 	"strconv"
-	"time"
 )
 
-func RandomColor() {
-	source := rand.NewSource(time.Now().UnixNano())
-	generator := rand.New(source)
-	Colors["random"] = fmt.Sprintf("%d;%d;%d", generator.Intn(255), generator.Intn(255), generator.Intn(255))
-}
-
 func ToColorIndexes() {
-	if Arguments.Color.ToColor == "" {
-		Arguments.Color.ToColorIndices = nil
+	if Args.ColorFlag.ToColor == "" {
+		Args.ColorFlag.ToColorIndices = append(Args.ColorFlag.ToColorIndices, []int{0, len(Args.ToDraw) - 1})
 		return
 	}
-	for i := 0; i < len(Arguments.ToDraw)-len(Arguments.Color.ToColor)+1; i++ {
-		if Arguments.ToDraw[i:i+len(Arguments.Color.ToColor)] == Arguments.Color.ToColor {
-			Arguments.Color.ToColorIndices = append(Arguments.Color.ToColorIndices, []int{i, i + len(Arguments.Color.ToColor) - 1})
-			i += len(Arguments.Color.ToColor) - 1
+	for i := 0; i < len(Args.ToDraw)-len(Args.ColorFlag.ToColor)+1; i++ {
+		if Args.ToDraw[i:i+len(Args.ColorFlag.ToColor)] == Args.ColorFlag.ToColor {
+			Args.ColorFlag.ToColorIndices = append(Args.ColorFlag.ToColorIndices, []int{i, i + len(Args.ColorFlag.ToColor) - 1})
+			i += len(Args.ColorFlag.ToColor) - 1
 		}
 	}
 }
 
 func InRange(index int) bool {
-	for _, pair := range Arguments.Color.ToColorIndices {
+	for _, pair := range Args.ColorFlag.ToColorIndices {
 		if index >= pair[0] && index <= pair[1] {
 			return true
 		}
@@ -36,44 +27,46 @@ func InRange(index int) bool {
 	return false
 }
 
-func HexToRgb(hexColor string) (string, error) {
+func HexToRgb(hexColor string) (Color, error) {
 	if HexCheck.MatchString(hexColor) {
 		r, err := strconv.ParseInt(hexColor[1:3], 16, 64)
 		if err != nil {
-			return "", err
+			return Color{}, err
 		}
 		g, err := strconv.ParseInt(hexColor[3:5], 16, 64)
 		if err != nil {
-			return "", err
+			return Color{}, err
 		}
 		b, err := strconv.ParseInt(hexColor[5:7], 16, 64)
 		if err != nil {
-			return "", err
+			return Color{}, err
 		}
-		return fmt.Sprintf("\033[38;2;%d;%d;%dm", r, g, b), nil
+		return Color{R: int(r), G: int(g), B: int(b)}, nil
+		// return fmt.Sprintf("\033[38;2;%d;%d;%dm", r, g, b), nil
 
 	}
-	return "", errors.New("invalidhex")
+	return Color{}, errors.New("invalidhex")
 }
 
-func RGB(color string) (string, error) {
+func RGB(color string) (Color, error) {
 	if match := RgbCheck.FindStringSubmatch(color); match != nil {
 		r, err := strconv.Atoi(match[1])
 		if err != nil {
-			return "", err
+			return Color{}, err
 		}
 		g, err := strconv.Atoi(match[2])
 		if err != nil {
-			return "", err
+			return Color{}, err
 		}
 		b, err := strconv.Atoi(match[3])
 		if err != nil {
-			return "", err
+			return Color{}, err
 		}
 		if r > 255 || g > 255 || b > 255 {
-			return "", errors.New("InvalidRgbValue")
+			return Color{}, errors.New("InvalidRgbValue")
 		}
-		return fmt.Sprintf("\033[38;2;%d;%d;%dm", r, g, b), nil
+		// return fmt.Sprintf("\033[38;2;%d;%d;%dm", r, g, b), nil
+		return Color{R: r, G: g, B: b}, nil
 	}
-	return "", errors.New("rgbFormat")
+	return Color{}, errors.New("rgbFormat")
 }
