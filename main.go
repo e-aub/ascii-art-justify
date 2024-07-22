@@ -11,17 +11,17 @@ import (
 func main() {
 	// Check if the provided flags and args are valid
 	err := f.ArgsChecker(os.Args[1:])
-	errHandler(err)
+	f.ErrHandler(err)
 	if f.Args.ToDraw == "" {
 		return
 	}
 	f.ToColorIndexes()
 	// Minimize the input string
 	toMap, err := f.Minimize()
-	errHandler(err)
+	f.ErrHandler(err)
 	// Map the input string to the selected font
 	err = f.MapFont(toMap)
-	errHandler(err)
+	f.ErrHandler(err)
 	// Split the input string and Build the output
 	spliced := f.Split()
 
@@ -38,12 +38,9 @@ func main() {
 
 	// Deliver the output to the console
 	err = f.OutputDeliver(art)
-	errHandler(err)
-}
-
-func errHandler(err error) {
-	if err != nil {
-		fmt.Println(f.Errors[err.Error()])
-		os.Exit(1)
+	f.ErrHandler(err)
+	if f.Args.AlignFlag.Align != "" {
+		nSpaces := f.Align()
+		fmt.Println(nSpaces)
 	}
 }

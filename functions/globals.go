@@ -2,6 +2,7 @@ package functions
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -27,11 +28,16 @@ type Color struct {
 	B int
 }
 
+type AlignFlag struct {
+	Align  string
+	Margin int
+}
+
 type arguments struct {
 	ToDraw    string
 	Banner    string
 	FileName  string
-	Align     string
+	AlignFlag AlignFlag
 	ColorFlag ColorFlag
 }
 
@@ -39,7 +45,10 @@ var Args = arguments{
 	ToDraw:   "",
 	Banner:   "",
 	FileName: "",
-	Align:    "",
+	AlignFlag: AlignFlag{
+		Align:  "",
+		Margin: 0,
+	},
 	ColorFlag: ColorFlag{
 		Color:            Color{},
 		ToColor:          "",
@@ -67,6 +76,7 @@ var (
 	RgbCheck       = regexp.MustCompile(`^rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)$`)
 	HexPattern     = regexp.MustCompile(`^#`)
 	HexCheck       = regexp.MustCompile(`^#[0-9A-Fa-f]{6}$`)
+	Spaces         = regexp.MustCompile(" +")
 )
 
 var Errors map[string]string = map[string]string{
@@ -79,6 +89,13 @@ var Errors map[string]string = map[string]string{
 	"rgbFormat":    "Invalid RGB format\n\nThe format must same as: rgb(<0-255>, <0-255>, <0-255>)",
 	"invalidhex":   "Invalid Hex Color\n\nThe hex code must be between #000000 -> #FFFFFF",
 	"char":         "Invalid Character\n\nThe characters must be between ' ' and '~'",
+}
+
+func ErrHandler(err error) {
+	if err != nil {
+		fmt.Println(Errors[err.Error()])
+		os.Exit(1)
+	}
 }
 
 func AvailableColors() string {

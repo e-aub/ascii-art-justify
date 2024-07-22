@@ -28,9 +28,25 @@ func OutputBuilder(splicedInput []string) string {
 			continue
 		}
 		count := 0
+		nSpace := 91
 		for count < 8 {
+			// for nSpace > 0 {
+			// 	result += " "
+			// 	nSpace--
+			// }
 			for i, letter := range part {
 				currentIndex := i + tracker
+				if Args.AlignFlag.Align != "" {
+					if Args.AlignFlag.Align == "left" && letter == ' ' {
+						for nSpace > 0 {
+							result += " "
+							nSpace--
+						}
+						nSpace = 91
+						continue
+					}
+				}
+
 				if InRange(currentIndex) {
 					result += color + Font[letter][count] + reset
 				} else {
@@ -40,6 +56,7 @@ func OutputBuilder(splicedInput []string) string {
 			result += "\n"
 			count++
 		}
+
 		tracker += len(part) + 2
 	}
 	if (Args.ColorFlag.Color != Color{}) && Args.FileName != "" {
