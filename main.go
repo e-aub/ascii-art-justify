@@ -34,13 +34,10 @@ func main() {
 			fmt.Println(f.Args.FileName)
 		}
 	}
-	art := f.OutputBuilder(spliced)
-
+	f.Args.AlignFlag.Margin = f.Align()
+	fmt.Println(f.Args.AlignFlag.Margin)
+	art := f.AsciiArt(spliced)
 	// Deliver the output to the console
 	err = f.OutputDeliver(art)
 	f.ErrHandler(err)
-	if f.Args.AlignFlag.Align != "" {
-		nSpaces := f.Align()
-		fmt.Println(nSpaces)
-	}
 }

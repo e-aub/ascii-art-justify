@@ -1,7 +1,6 @@
 package functions
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -25,11 +24,16 @@ func tput() int {
 
 func artWidth() int {
 	var width int
-	for _, letter := range Args.ToDraw {
-		if letter != ' ' {
-			width += len(Font[letter][0])
 
+	for _, letter := range Args.ToDraw {
+		if Args.AlignFlag.Align == "justify" {
+			if letter != ' ' {
+				width += len(Font[letter][0])
+			}
+		} else {
+			width += len(Font[letter][0])
 		}
+
 	}
 	return width
 }
@@ -37,16 +41,27 @@ func artWidth() int {
 func Align() int {
 	ttyWidth := tput()
 	artWidth := artWidth()
-	fmt.Println(ttyWidth)
-	fmt.Println(artWidth)
+	// fmt.Println(ttyWidth)
+	// fmt.Println(artWidth)
 
 	switch Args.AlignFlag.Align {
 	case "right":
-		return ttyWidth - artWidth
+		if margin := ttyWidth - artWidth; margin > 0 {
+			return margin
+		}
+		return 0
 	case "center":
-		return (ttyWidth - artWidth) / 2
+		if emptySpace := (ttyWidth - artWidth); emptySpace > 0 {
+			return emptySpace / 2
+		}
+		return 0
 	case "justify":
-		return (ttyWidth - artWidth) / (len(strings.Split(cleanSpaces(), " ")) - 1)
+		if wordsNumber := (len(strings.Split(cleanSpaces(), " ")) - 1); wordsNumber > 0 {
+			if margin := (ttyWidth - artWidth) / wordsNumber; margin > 0 {
+				return margin
+			}
+		}
+		return 0
 	}
 	return 0
 }
