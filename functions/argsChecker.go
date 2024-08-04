@@ -3,7 +3,6 @@ package functions
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -27,7 +26,7 @@ func ArgsChecker(args []string) error {
 				}
 				Args.FileName = output[1]
 			} else {
-				return errors.New("")
+				return errors.New("output")
 			}
 		} else if ColorPattern.MatchString(args[i]) {
 			if color := ColorCheck.FindStringSubmatch(args[i]); color != nil {
@@ -37,20 +36,20 @@ func ArgsChecker(args []string) error {
 				if RgbPattern.MatchString(color[1]) {
 					color, err := RGB(color[1])
 					if err != nil {
-						log.Fatalln(err)
+						ErrHandler(err)
 					}
 					Args.ColorFlag.Color = color
 				} else if HexPattern.MatchString(color[1]) {
 					color, err := HexToRgb(color[1])
 					if err != nil {
-						log.Fatalln(err)
+						ErrHandler(err)
 					}
 					Args.ColorFlag.Color = color
 
 				} else {
 					color, ok := Colors[strings.ToLower(color[1])]
 					if !ok {
-						log.Fatalln(errors.New("invalidColor"))
+						ErrHandler(errors.New("invalidColor"))
 					}
 					Args.ColorFlag.Color = color
 				}
@@ -74,7 +73,7 @@ func ArgsChecker(args []string) error {
 				}
 				Args.AlignFlag.Align = justify[1]
 			} else {
-				return errors.New("")
+				return errors.New("justify")
 			}
 		} else {
 			stringArguments = append(stringArguments, args[i])
@@ -84,17 +83,14 @@ func ArgsChecker(args []string) error {
 		if Args.ColorFlag.ToColor != "" {
 			Args.ToDraw = Args.ColorFlag.ToColor
 		} else {
-			return fmt.Errorf("missing input string")
+			return fmt.Errorf("global")
 		}
-	} else if len(stringArguments) > 1 {
-		return fmt.Errorf("invalid syntax: %v", stringArguments)
-	} else {
+	} else if len(stringArguments) == 1 {
 		if Args.ToDraw == "" {
 			Args.ToDraw = stringArguments[0]
-			stringArguments = stringArguments[1:]
 		}
+	} else if len(stringArguments) >= 2 {
+		return fmt.Errorf("global")
 	}
-	// fmt.Println(Arguments)
-	fmt.Println(stringArguments)
 	return nil
 }

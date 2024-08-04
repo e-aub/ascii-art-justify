@@ -42,8 +42,6 @@ func HexToRgb(hexColor string) (Color, error) {
 			return Color{}, err
 		}
 		return Color{R: int(r), G: int(g), B: int(b)}, nil
-		// return fmt.Sprintf("\033[38;2;%d;%d;%dm", r, g, b), nil
-
 	}
 	return Color{}, errors.New("invalidhex")
 }
@@ -63,9 +61,8 @@ func RGB(color string) (Color, error) {
 			return Color{}, err
 		}
 		if r > 255 || g > 255 || b > 255 {
-			return Color{}, errors.New("InvalidRgbValue")
+			return Color{}, errors.New("rgbFormat")
 		}
-		// return fmt.Sprintf("\033[38;2;%d;%d;%dm", r, g, b), nil
 		return Color{R: r, G: g, B: b}, nil
 	}
 	return Color{}, errors.New("rgbFormat")

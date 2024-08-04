@@ -71,7 +71,7 @@ var (
 	OutputCheck    = regexp.MustCompile(`^(?:--output=)(.+.txt|.+.rtf)$`)
 	ColorPattern   = regexp.MustCompile(`^-{1,2}color`)
 	ColorCheck     = regexp.MustCompile(`^(?:--color=)(.+)$`)
-	ValidBanner    = regexp.MustCompile(`^standard$|^shadow$|^enigma$|^nirvana$|^standard.txt$|^shadow.txt$|^enigma.txt$|^nirvana.txt$`)
+	ValidBanner    = regexp.MustCompile(`^standard$|^shadow$|^thinkertoy$|^enigma$|^nirvana$|^standard.txt$|^shadow.txt$|^thinkertoy.txt$|^enigma.txt$|^nirvana.txt$`)
 	RgbPattern     = regexp.MustCompile(`^rgb\(`)
 	RgbCheck       = regexp.MustCompile(`^rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)$`)
 	HexPattern     = regexp.MustCompile(`^#`)
@@ -80,9 +80,11 @@ var (
 )
 
 var Errors map[string]string = map[string]string{
-	"output":       "Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . EX: go run . --output=<filename.txt> \"something\"",
-	"color":        "Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . EX: go run . --color=<color> <letters to be colored> \"something\"",
+	"global":       "Usage: go run . [OPTION | STRING] ... [BANNER]\n\nEX: go run . --output=<filename.txt> --color=#ff00ff s \"something\" --align=justify",
+	"output":       "Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --output=<filename.txt> \"something\"",
+	"color":        "Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> \"something\"",
 	"fs":           "Invalid banner\n\nAvailable banners: standard, shadow, thinkertoy, enigma, nirvana",
+	"justify":      "Usage: go run .  [OPTION] [STRING] [BANNER]\n\nExample: go run . --align=right  something  standard",
 	"invalidColor": AvailableColors(),
 	"internal":     "Internal program error",
 	"rgbValue":     "Invalid RGB value\n\nThe numbers must be between 0 and 255 (ex: rgb(<0-255>, <0-255>, <0-255>))",
@@ -93,8 +95,12 @@ var Errors map[string]string = map[string]string{
 
 func ErrHandler(err error) {
 	if err != nil {
-		fmt.Println(Errors[err.Error()])
-		os.Exit(1)
+		if eror, exists := Errors[err.Error()]; exists {
+			fmt.Fprintln(os.Stderr, eror)
+		} else {
+			fmt.Fprintln(os.Stderr, err.Error())
+		}
+		os.Exit(0)
 	}
 }
 
@@ -102,7 +108,7 @@ func AvailableColors() string {
 	var str strings.Builder
 	str.WriteString("Available colors:\n\n")
 	for name, color := range Colors {
-		str.WriteString(fmt.Sprintf("\033[38;2;%d;%d;%dm%s%s"+", ", color.R, color.G, color.B, name, "\033[0m, "))
+		str.WriteString(fmt.Sprintf("\033[38;2;%d;%d;%dm%s%s", color.R, color.G, color.B, name, "\033[0m\n"))
 	}
 	return str.String()
 }
